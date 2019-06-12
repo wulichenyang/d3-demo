@@ -179,7 +179,7 @@ class GraphView extends React.Component<IProps, {}> {
 
     const ticked = () => {
       // // Render it when the graph is stable enough
-      if (simulation.alpha() <= 0.05) {
+      // if (simulation.alpha() <= 0.05) {
         // Relocate links
         link
           .attr("x1", function (d: Relationship) { return (d.source as Node).x; })
@@ -208,10 +208,9 @@ class GraphView extends React.Component<IProps, {}> {
             return 'rotate(0)';
           }
         });
-        console.timeEnd('x');
         // // Stop rendering
         // simulation.stop()
-      }
+      // }
     }
 
     const updatePosition = () => {
@@ -271,7 +270,6 @@ class GraphView extends React.Component<IProps, {}> {
   }
 
   componentWillReceiveProps({ nodes, relationships }: IProps) {
-    console.time('x')
     this.initGraph(nodes, relationships)
   }
 

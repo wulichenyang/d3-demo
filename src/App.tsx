@@ -4,17 +4,14 @@ import './assets/css/App.less';
 // import Header from './components/Layout/Header/Header'
 import Footer from './components/Layout/Footer/Footer'
 import SideBar from './components/Layout/SideBar/SideBar';
+import Loader from './components/Loader/Loader';
 import Main from './components/Main/Main';
 import * as themes from './assets/css/themes'
 import { ThemeProvider } from 'styled-components'
 import { ITheme } from './assets/css/themes'
-
 import {
-  StyledWrapper,
   AppWrapper,
-  StyledApp,
-  StyledBody,
-  StyledMainWrapper,
+  StyledWrapper,
 } from './styled'
 // import Home from './views/Home';
 // import About from './views/About';
@@ -22,20 +19,7 @@ import {
 import ErrorBoundary from './components/Error/ErrorBoundary';
 
 interface Iprops {
-  // drawer,
-  // cmdchar,
-  // handleNavClick,
-  // activeConnection,
-  // connectionState,
   theme: string,
-  // errorMessage,
-  // loadExternalScripts,
-  // loadSync,
-  // syncConsent,
-  // browserSyncMetadata,
-  // browserSyncConfig,
-  // browserSyncAuthStatus,
-  // experimentalFeatures
 }
 
 interface IState {
@@ -45,20 +29,7 @@ interface IState {
 class App extends React.Component<Iprops, IState> {
   render() {
     const {
-      // drawer,
-      // cmdchar,
-      // handleNavClick,
-      // activeConnection,
-      // connectionState,
       theme,
-      // errorMessage,
-      // loadExternalScripts,
-      // loadSync,
-      // syncConsent,
-      // browserSyncMetadata,
-      // browserSyncConfig,
-      // browserSyncAuthStatus,
-      // experimentalFeatures
     } = this.props
 
     const themeData = (themes as ITheme)[theme] || themes['normal']
@@ -67,25 +38,12 @@ class App extends React.Component<Iprops, IState> {
       <Router>
         <ErrorBoundary>
           <ThemeProvider theme={themeData}>
-            <AppWrapper> {/* Not used */}
+            <AppWrapper>
+              <Loader loading={false} />
               <StyledWrapper>
-                {/* DocTitle/UserInteraction/DesktopInteration/... */}
-                {/* <Header /> */}
-                <StyledApp>
-                  <StyledBody>
-                    <ErrorBoundary>
-                      <SideBar />
-                    </ErrorBoundary>
-                  
-                    <StyledMainWrapper>
-                      <Main />
-                    </StyledMainWrapper>
-                  </StyledBody>
-                </StyledApp>
-
+                <SideBar />
+                <Main />
               </StyledWrapper>
-
-              <Footer />
             </AppWrapper>
           </ThemeProvider>
         </ErrorBoundary>
