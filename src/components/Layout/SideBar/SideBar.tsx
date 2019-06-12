@@ -23,13 +23,13 @@ const SideBar: React.FC = () => {
         <LogoWrapper><i></i>Graph Demo</LogoWrapper>
         <SideContentWrapper>
           <SideNavList>
-            {['graph', 'graph2', 'graph3'].map(LinkName => {
+            {['graph', 'graph2', 'graph3'].map(linkName => {
               return (
-                <SideNavItem>
+                <SideNavItem key={linkName}>
                   <NavLink 
-                    to={`/d3demo/${LinkName}`}
+                    to={`/${linkName}`}
                   >
-                    {LinkName}
+                    {linkName}
                   </NavLink>
                 </SideNavItem>)
             })}
