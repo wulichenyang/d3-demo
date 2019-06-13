@@ -28,7 +28,7 @@ interface IState {
   graphViewData: IGraphViewData
 }
 
-class ForcDirectedGraph extends React.Component<IProps, IState> {
+class ForceDirectedGraph extends React.Component<IProps, IState> {
   readonly state: IState = {
     graphViewData: {
       nodes: [],
@@ -78,8 +78,8 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
 
     }
     let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
-    let svg: D3dom = d3Select("svg")
-      .attr("class", "graph-view-svg")
+
+    let svg: D3dom = d3Select("svg.force-directed")
       .attr("overflow", "hidden")
       .call(d3Drag()
         .on("start", svgdragstarted)
@@ -101,10 +101,9 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
     // Declare a force-directed graph simulation
     let simulation = d3.forceSimulation()
       .force("link", d3.forceLink().id(function (d: Relationship) { return d.id; }).distance(200).strength(1))
-      .force("charge", d3.forceManyBody())
+      .force("charge", d3.forceManyBody().strength(-100)) // ???
       .force("center", d3.forceCenter(width / 2, height / 2))
     // .alphaDecay(.7)
-
     const update = (links: Relationship[], nodes: Node[]) => {
       // Define Arrow
       draggableSvg.append('defs').append('marker')
@@ -179,7 +178,8 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
 
       node.append("circle")
         .attr("r", 10)
-        .style("fill", function (d: Node, i: number) { return colors(i); })
+        .style("fill", function (d: Node, i: number) { return colors(i % 6); })
+        .style("stroke", function (d: Node, i: number) { return d3.rgb(colors(i % 6)).darker(2); })
 
       node.append("text")
         .attr("dy", -3)
@@ -192,6 +192,12 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
         .on("end", updatePosition)
       simulation.force("link")
         .links(links);
+
+      // Transition
+      svg.style("opacity", 1e-6)
+        .transition()
+        .duration(1000)
+        .style("opacity", 1);
     }
 
     const ticked = () => {
@@ -225,6 +231,7 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
           return 'rotate(0)';
         }
       });
+      // console.timeEnd('x');
       // // Stop rendering
       // simulation.stop()
       // }
@@ -301,10 +308,10 @@ class ForcDirectedGraph extends React.Component<IProps, IState> {
     return (
       <GraphViewWrapper>
         <h2>graph IGraphViewDataItem</h2>
-        <svg width={graphWidth} height={graphHeight}></svg>
+        <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
       </GraphViewWrapper>
     );
   }
 }
 
-export default ForcDirectedGraph
+export default ForceDirectedGraph

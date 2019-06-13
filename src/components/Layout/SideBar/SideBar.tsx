@@ -1,7 +1,7 @@
 import React from 'react';
 import "./index.less";
 import { NavLink } from 'react-router-dom'
-
+import { Icon } from 'antd'
 import {
   SideBarWrapper,
   SideBarInner,
@@ -23,16 +23,28 @@ const SideBar: React.FC = () => {
         <LogoWrapper><i></i>Graph Demo</LogoWrapper>
         <SideContentWrapper>
           <SideNavList>
-            {['graph', 'graph2', 'graph3'].map(linkName => {
-              return (
-                <SideNavItem key={linkName}>
-                  <NavLink 
-                    to={`/${linkName}`}
-                  >
-                    {linkName}
-                  </NavLink>
-                </SideNavItem>)
-            })}
+            {[
+              {
+                linkName: 'Force-directed',
+                iconName: 'dot-chart'
+              },
+              {
+                linkName: 'Sunburst',
+                iconName: 'bubble-chart'
+              },
+              {
+                linkName: 'graph3',
+                iconName: 'chart'
+              }].map(link => {
+                return (
+                  <SideNavItem key={link.linkName}>
+                    <NavLink
+                      to={`/${link.linkName}`}
+                    >
+                      <Icon type={link.iconName} />{link.linkName}
+                    </NavLink>
+                  </SideNavItem>)
+              })}
           </SideNavList>
         </SideContentWrapper>
       </SideBarInner>
