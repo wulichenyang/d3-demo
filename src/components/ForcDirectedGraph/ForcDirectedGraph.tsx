@@ -8,6 +8,9 @@ import {
   select as d3Select
 } from 'd3-selection';
 import { getTranslation } from '../../utils/d3-transform'
+import {
+  getGraphViewData
+} from '../../api/graph'
 
 import {
   Node,
@@ -17,27 +20,41 @@ import {
 } from './types'
 
 interface IProps {
-  // graphViewData: IGraphViewData
-  nodes: Node[],
-  relationships: Relationship[],
   graphWidth: number,
   graphHeight: number,
 }
-// interface IState {
-//   svg: D3dom,
-// };
 
-class GraphView extends React.Component<IProps, {}> {
+interface IState {
+  graphViewData: IGraphViewData
+}
 
+class ForcDirectedGraph extends React.Component<IProps, IState> {
+  readonly state: IState = {
+    graphViewData: {
+      nodes: [],
+      relationships: []
+    }
+  }
   static defaultProps = {
-    nodes: [],
-    relationships: [],
     graphWidth: 960,
     graphHeight: 600,
   };
   // readonly state: IState = {
   //   svg: {},
   // };
+  async componentDidMount() {
+    const res: Ajax.AjaxResponse = await getGraphViewData()
+    if (res && res.code === 0) {
+      // console.log(res)
+      this.setState({
+        graphViewData: {
+          nodes: res.data.nodes,
+          relationships: res.data.relationships
+        }
+      })
+    }
+    this.initGraph(this.state.graphViewData.nodes,  this.state.graphViewData.relationships)
+  }
 
   initGraph = (nodes: Node[], relationships: Relationship[]) => {
     // Listen to dragging of the SVG
@@ -180,36 +197,36 @@ class GraphView extends React.Component<IProps, {}> {
     const ticked = () => {
       // // Render it when the graph is stable enough
       // if (simulation.alpha() <= 0.05) {
-        // Relocate links
-        link
-          .attr("x1", function (d: Relationship) { return (d.source as Node).x; })
-          .attr("y1", function (d: Relationship) { return (d.source as Node).y; })
-          .attr("x2", function (d: Relationship) { return (d.target as Node).x; })
-          .attr("y2", function (d: Relationship) { return (d.target as Node).y; });
+      // Relocate links
+      link
+        .attr("x1", function (d: Relationship) { return (d.source as Node).x; })
+        .attr("y1", function (d: Relationship) { return (d.source as Node).y; })
+        .attr("x2", function (d: Relationship) { return (d.target as Node).x; })
+        .attr("y2", function (d: Relationship) { return (d.target as Node).y; });
 
-        // Relocate nodes
-        node
-          .attr("transform", function (d: Node) { return "translate(" + d.x + ", " + d.y + ")"; });
+      // Relocate nodes
+      node
+        .attr("transform", function (d: Node) { return "translate(" + d.x + ", " + d.y + ")"; });
 
-        // Relocate virtual lines that the text based on
-        relTextPath.attr('d', function (d: Relationship) {
-          return 'M ' + (d.source as Node).x + ' ' + (d.source as Node).y + ' L ' + (d.target as Node).x + ' ' + (d.target as Node).y;
-        });
+      // Relocate virtual lines that the text based on
+      relTextPath.attr('d', function (d: Relationship) {
+        return 'M ' + (d.source as Node).x + ' ' + (d.source as Node).y + ' L ' + (d.target as Node).x + ' ' + (d.target as Node).y;
+      });
 
-        relType.attr('transform', function (this: D3dom, d: Relationship) {
-          if ((d.target as any).x < (d.source as any).x) {
-            let bbox = (this).getBBox();
+      relType.attr('transform', function (this: D3dom, d: Relationship) {
+        if ((d.target as any).x < (d.source as any).x) {
+          let bbox = (this).getBBox();
 
-            let rx = bbox.x + bbox.width / 2;
-            let ry = bbox.y + bbox.height / 2;
-            return 'rotate(180 ' + rx + ' ' + ry + ')';
-          }
-          else {
-            return 'rotate(0)';
-          }
-        });
-        // // Stop rendering
-        // simulation.stop()
+          let rx = bbox.x + bbox.width / 2;
+          let ry = bbox.y + bbox.height / 2;
+          return 'rotate(180 ' + rx + ' ' + ry + ')';
+        }
+        else {
+          return 'rotate(0)';
+        }
+      });
+      // // Stop rendering
+      // simulation.stop()
       // }
     }
 
@@ -269,9 +286,14 @@ class GraphView extends React.Component<IProps, {}> {
     update(relationships, nodes)
   }
 
-  componentWillReceiveProps({ nodes, relationships }: IProps) {
-    this.initGraph(nodes, relationships)
-  }
+  // componentDidUpdate(prevProps: IProps, { graphViewData }: IState) {
+  //   const { nodes, relationships } = graphViewData
+  //   this.updateGraph(nodes, relationships)
+  // }
+
+  // shouldComponentUpdate({ nodes, relationships }: IProps, newState: {}) {
+  //   nodes
+  // }
 
   render() {
     const { graphWidth, graphHeight } = this.props
@@ -285,4 +307,4 @@ class GraphView extends React.Component<IProps, {}> {
   }
 }
 
-export default GraphView
+export default ForcDirectedGraph

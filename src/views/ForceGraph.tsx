@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
-import About from './About'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+// import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+// import { IGraphViewData } from '../components/GraphView/types'
+import ForcDirectedGraph from './../components/ForcDirectedGraph/ForcDirectedGraph';
 
-
-class ForceGraph extends Component<{}, {}> {
-  render() {
-    return (
-      <Router basename="/graph">
-        {"Force graph"}
-        <br/>
-        <Link to="/nextSub">next</Link>
-        <Route path="/nextSub" component={About} />
-      </Router>
-    )
-  }
+const ForceGraph: React.FC<{}> = () => {
+  return (
+    <>
+      <ForcDirectedGraph
+        graphWidth={960}
+        graphHeight={600}
+      />
+    </>
+  )
 }
-
 export default ForceGraph
