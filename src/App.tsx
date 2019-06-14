@@ -62,9 +62,7 @@ class App extends React.Component<Iprops, IState> {
                 <SideBar className={sidebarCollapsed ? 'sidebar-collapsed' : ''} />
                 <Main toggleSidebar={this.toggleSidebar} />
               </StyledWrapper>
-              <div>
-                <BackTop target={() => document.getElementById('right-wrapper')} />
-              </div>
+              <BackTop target={() => document.getElementById('right-wrapper')} />
             </AppWrapper>
           </ThemeProvider>
         </ErrorBoundary>

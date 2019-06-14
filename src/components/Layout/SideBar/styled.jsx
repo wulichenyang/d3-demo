@@ -16,6 +16,16 @@ transition: all .2s;
   min-width: 80px;
   width: 80px;
   transition: all .2s;
+  .logo-wrapper {
+    img {
+      width: 48px;
+      transition: width ease .3s;
+    }
+    span {
+      width: 0;
+      transition: width .3s ease;
+    }
+  }
   li {
     line-height: initial;
     }
@@ -112,6 +122,9 @@ export const SideNavList = styled.ul`
       }
     }
     i {
+      width: 14px;
+      margin-right: 10px;
+      font-size: 13px;
       transition: font-size .15s cubic-bezier(.215,.61,.355,1),margin .3s cubic-bezier(.645,.045,.355,1);    
     }
   }
@@ -122,7 +135,14 @@ export const NavSpan = styled.span`
   overflow:hidden;
   transition: opacity .3s cubic-bezier(.645,.045,.355,1),width .3s cubic-bezier(.645,.045,.355,1);
 `
-
+export const LogoSpan = styled.span`
+  display: inline-block;
+  color: ${props=>props.theme.logoText}
+  font-size: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width .3s ease;
+`
 
 
 // export const SideBarSectionWrapper = styled.section`

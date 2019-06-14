@@ -19,6 +19,7 @@ export const base = {
   link: '#428BCA',
   linkHover: '#5dade2',
   breadTabText: '#999',
+  logoText: '#777',
   footerText: 'rgba(0,0,0,.45);',
 
   // Backgrounds

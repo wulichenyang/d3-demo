@@ -2,6 +2,7 @@ import React from 'react';
 import "./index.less";
 import { NavLink } from 'react-router-dom'
 import { Icon } from 'antd'
+import GraphLogo from '../../../assets/img/graph-logo.png'
 import {
   SideBarWrapper,
   SideBarInner,
@@ -10,6 +11,7 @@ import {
   SideNavList,
   SideNavItem,
   NavSpan,
+  LogoSpan
 } from './styled';
 
 interface IProps {
@@ -21,7 +23,14 @@ const SideBar: React.FC<IProps> = ({ className, style }: IProps) => {
   return (
     <SideBarWrapper className={className} style={style}>
       <SideBarInner>
-        <LogoWrapper><i></i>Graph Demo</LogoWrapper>
+        <LogoWrapper className="logo-wrapper">
+          <a href="/">
+            <img src={GraphLogo} alt="GraphLogo" />
+            <LogoSpan>
+              Graph Demo
+            </LogoSpan>
+          </a>
+        </LogoWrapper>
         <SideContentWrapper>
           <SideNavList>
             {[
