@@ -19,7 +19,7 @@ export const base = {
   link: '#428BCA',
   linkHover: '#5dade2',
   breadTabText: '#999',
-  
+  footerText: 'rgba(0,0,0,.45);',
 
   // Backgrounds
   primaryBackground: '#D2D5DA',
@@ -71,6 +71,8 @@ export const base = {
   frameBorder: 'none',
   inFrameBorder: '1px solid #e6e9ef',
   topicBorder: '1px solid #dadada',
+
+  asideLinkRightBorderActive: '2px solid #1890ff',
 
   // Frame
   frameSidebarBackground: '#F8F9FB',

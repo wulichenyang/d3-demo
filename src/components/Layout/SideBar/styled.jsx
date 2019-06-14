@@ -1,29 +1,33 @@
 import styled from 'styled-components'
 
 export const SideBarWrapper = styled.aside`
-  flex: 0 0 256px;
-  max-width: 256px;
-  min-width: 256px;
-  width: 256px;
-  height: 100%;
-  position: relative;
-  box-shadow: 0 0 28px 0 rgba(0,0,0,.05);
+flex: 0 0 256px;
+max-width: 256px;
+min-width: 256px;
+width: 256px;
+height: 100%;
+position: relative;
+box-shadow: 0 0 28px 0 rgba(0,0,0,.05);
+transition: all .2s;
+  
+&.sidebar-collapsed {
+  flex: 0 0 80px;
+  max-width: 80px;
+  min-width: 80px;
+  width: 80px;
   transition: all .2s;
-
-  &.sidebar-collapsed {
-    flex: 0 0 80px;
-    max-width: 80px;
-    min-width: 80px;
-    width: 80px;
-    transition: all .2s;
-    li {
-      line-height: initial;
+  li {
+    line-height: initial;
     }
     li>a {
       display: flex;
       justify-content: center;
       padding-left: 16px;
       text-align: center;
+      &:after {
+        border-right: none;
+        transition: all ease .3s
+      }
       i {
         font-size: 16px
         margin-right: 0;
@@ -38,24 +42,24 @@ export const SideBarWrapper = styled.aside`
       }
     }
   }
-`
-
-export const SideBarInner = styled.div`
+  `
+  
+  export const SideBarInner = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-`
+  `
 
-export const LogoWrapper = styled.div`
+  export const LogoWrapper = styled.div`
   height: 72px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 1px 9px -3px rgba(0,0,0,.2);
-`
+  `
 
 export const SideContentWrapper = styled.div`
-  height: calc(100vh - 72px);
+height: calc(100vh - 72px);
 `
 
 export const SideNavList = styled.ul`
@@ -63,9 +67,9 @@ export const SideNavList = styled.ul`
   height: 100%;
   overflow: auto;
   transition: background .3s,width .2s;
-`
-
-export const SideNavItem = styled.li`
+  `
+  
+  export const SideNavItem = styled.li`
   height: 40px;
   line-height: 40px;
   &:hover {
@@ -74,6 +78,7 @@ export const SideNavItem = styled.li`
   &>a {
     width: 100%;
     display: inline-block;
+    position: relative;
     padding-left: 24px;
     padding-right: 16px;
     line-height: 40px;
@@ -85,9 +90,26 @@ export const SideNavItem = styled.li`
     &:hover {
       color: ${props => props.theme.asideLinkActive};
     }
+    &:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      border-right: ${props=>props.theme.asideLinkRightBorderActive};
+      transform: scaleY(.0001);
+      transition: transform .15s cubic-bezier(.215,.61,.355,1),opacity .15s cubic-bezier(.215,.61,.355,1);
+      content: "";
+    }
     &.active {
       color: ${props => props.theme.asideLinkActive};
       background-color: ${props => props.theme.asideLinkActiveBackground};
+      &:after {
+        transform: scaleY(1);
+        opacity: 1;
+        transition: transform .15s cubic-bezier(.645,.045,.355,1),opacity .15s cubic-bezier(.645,.045,.355,1);
+        border-right: ${props=>props.theme.asideLinkRightBorderActive};
+      }
     }
     i {
       transition: font-size .15s cubic-bezier(.215,.61,.355,1),margin .3s cubic-bezier(.645,.045,.355,1);    

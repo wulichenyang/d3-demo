@@ -10,6 +10,8 @@ import ErrorBoundary from './components/Error/ErrorBoundary';
 import * as themes from './assets/css/themes'
 import { ThemeProvider } from 'styled-components'
 import { ITheme } from './assets/css/themes'
+import { BackTop, Icon } from 'antd'
+
 import {
   AppWrapper,
   StyledWrapper,
@@ -60,6 +62,9 @@ class App extends React.Component<Iprops, IState> {
                 <SideBar className={sidebarCollapsed ? 'sidebar-collapsed' : ''} />
                 <Main toggleSidebar={this.toggleSidebar} />
               </StyledWrapper>
+              <div>
+                <BackTop target={() => document.getElementById('right-wrapper')} />
+              </div>
             </AppWrapper>
           </ThemeProvider>
         </ErrorBoundary>

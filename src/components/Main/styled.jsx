@@ -8,4 +8,5 @@ export const RightWrapper = styled.div`
 export const MainWrapper = styled.main`
   padding: 24px;
   background: ${props=>props.theme.mainBackground};
+  min-height: calc(100vh - 144px)
 `

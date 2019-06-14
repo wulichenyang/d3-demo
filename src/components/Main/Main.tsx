@@ -5,6 +5,7 @@ import ForceGraph from '../../views/ForceGraph'
 import Sunburst from '../../views/Sunburst'
 import Header from '../../components/Layout/Header/Header'
 import Footer from '../../components/Layout/Footer/Footer'
+
 import {
   MainWrapper,
   RightWrapper,
@@ -18,7 +19,7 @@ class Main extends React.Component<IProps, {}> {
   render() {
     const { toggleSidebar } = this.props
     return (
-      <RightWrapper>
+      <RightWrapper id="right-wrapper">
         <Header toggleSidebar={toggleSidebar} />
         <MainWrapper className="dd">
           <Route exact path="/" component={Home} />
