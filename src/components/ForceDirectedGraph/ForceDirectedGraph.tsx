@@ -1,5 +1,7 @@
 import "./index.less";
-import { GraphViewWrapper } from './styled';
+import { 
+  
+} from './styled';
 import React from 'react'
 import * as d3 from "d3";
 import { drag as d3Drag } from 'd3-drag';
@@ -306,10 +308,10 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     const { graphWidth, graphHeight } = this.props
 
     return (
-      <GraphViewWrapper>
+      <>
         <h2>graph IGraphViewDataItem</h2>
         <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
-      </GraphViewWrapper>
+      </>
     );
   }
 }

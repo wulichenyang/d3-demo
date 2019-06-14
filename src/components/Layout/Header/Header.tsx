@@ -1,26 +1,28 @@
 import { Link } from "react-router-dom";
 import React from 'react'
 import "./index.less";
-import { HeaderWrapper } from './styled'
-
-export const Header: React.FC = () => {
+import {
+  HeaderWrapper,
+  ButtonToggle,
+  UserInfo
+} from './styled'
+import { Icon } from 'antd'
+interface IProps {
+  toggleSidebar: () => void,
+}
+export const Header: React.FC<IProps> = ({ toggleSidebar }: IProps) => {
+  const onToggleSidebar = () => {
+    toggleSidebar()
+  }
   return (
-    // <HeaderWrapper >
-    //   <nav>
-    //     <ul>
-    //       <li>
-    //         <Link to="/">Home</Link>
-    //       </li>
-    //       <li>
-    //         <Link to="/about">About</Link>
-    //       </li>
-    //       <li>
-    //         <Link to="/topics">Topics</Link>
-    //       </li>
-    //     </ul>
-    //   </nav>
-    // </HeaderWrapper>
-    null
+    <HeaderWrapper>
+      <ButtonToggle onClick={onToggleSidebar}>
+        <Icon type="menu-fold" />
+      </ButtonToggle>
+      <UserInfo>
+
+      </UserInfo>
+    </HeaderWrapper>
   );
 }
 

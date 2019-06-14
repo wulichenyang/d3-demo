@@ -7,8 +7,37 @@ export const SideBarWrapper = styled.aside`
   width: 256px;
   height: 100%;
   position: relative;
-  box-shadow: 0 0 28px 0 rgba(24,144,255,.1);
+  box-shadow: 0 0 28px 0 rgba(0,0,0,.05);
   transition: all .2s;
+
+  &.sidebar-collapsed {
+    flex: 0 0 80px;
+    max-width: 80px;
+    min-width: 80px;
+    width: 80px;
+    transition: all .2s;
+    li {
+      line-height: initial;
+    }
+    li>a {
+      display: flex;
+      justify-content: center;
+      padding-left: 16px;
+      text-align: center;
+      i {
+        font-size: 16px
+        margin-right: 0;
+        line-height: 40px;
+        transition: font-size .15s cubic-bezier(.215,.61,.355,1),margin .3s cubic-bezier(.645,.045,.355,1);
+      }
+      span {
+        transition: ease-out width .3s;
+        display: inline-block;
+        width: 0;
+        opacity: 0;
+      }
+    }
+  }
 `
 
 export const SideBarInner = styled.div`
@@ -22,6 +51,7 @@ export const LogoWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 1px 9px -3px rgba(0,0,0,.2);
 `
 
 export const SideContentWrapper = styled.div`
@@ -46,6 +76,7 @@ export const SideNavItem = styled.li`
     display: inline-block;
     padding-left: 24px;
     padding-right: 16px;
+    line-height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -58,8 +89,16 @@ export const SideNavItem = styled.li`
       color: ${props => props.theme.asideLinkActive};
       background-color: ${props => props.theme.asideLinkActiveBackground};
     }
+    i {
+      transition: font-size .15s cubic-bezier(.215,.61,.355,1),margin .3s cubic-bezier(.645,.045,.355,1);    
+    }
   }
+  `
 
+export const NavSpan = styled.span`
+  display: inline;
+  overflow:hidden;
+  transition: opacity .3s cubic-bezier(.645,.045,.355,1),width .3s cubic-bezier(.645,.045,.355,1);
 `
 
 

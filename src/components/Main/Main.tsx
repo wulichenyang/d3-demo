@@ -3,15 +3,30 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Home from '../../views/Home'
 import ForceGraph from '../../views/ForceGraph'
 import Sunburst from '../../views/Sunburst'
+import Header from '../../components/Layout/Header/Header'
+import Footer from '../../components/Layout/Footer/Footer'
+import {
+  MainWrapper,
+  RightWrapper,
+} from './styled.jsx'
 
-class Main extends React.Component<{}, {}> {
+interface IProps {
+  toggleSidebar: ()=>void
+}
+
+class Main extends React.Component<IProps, {}> {
   render() {
+    const { toggleSidebar } = this.props
     return (
-      <main>
-        <Route exact path="/" component={Home} />
-        <Route path="/Force-directed" component={ForceGraph} />
-        <Route path="/Sunburst" component={Sunburst} />
-      </main>
+      <RightWrapper>
+        <Header toggleSidebar={toggleSidebar} />
+        <MainWrapper className="dd">
+          <Route exact path="/" component={Home} />
+          <Route path="/Force-directed" component={ForceGraph} />
+          <Route path="/Sunburst" component={Sunburst} />
+        </MainWrapper>
+        <Footer />
+      </RightWrapper>
     );
   }
 }

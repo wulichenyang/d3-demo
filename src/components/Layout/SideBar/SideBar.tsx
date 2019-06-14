@@ -8,17 +8,18 @@ import {
   LogoWrapper,
   SideContentWrapper,
   SideNavList,
-  SideNavItem
+  SideNavItem,
+  NavSpan,
 } from './styled';
 
-// interface IProps {
-//   className?: string;
-//   style?: React.CSSProperties;
-// }
+interface IProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
 
-const SideBar: React.FC = () => {
+const SideBar: React.FC<IProps> = ({ className, style }: IProps) => {
   return (
-    <SideBarWrapper>
+    <SideBarWrapper className={className} style={style}>
       <SideBarInner>
         <LogoWrapper><i></i>Graph Demo</LogoWrapper>
         <SideContentWrapper>
@@ -41,7 +42,10 @@ const SideBar: React.FC = () => {
                     <NavLink
                       to={`/${link.linkName}`}
                     >
-                      <Icon type={link.iconName} />{link.linkName}
+                      <Icon type={link.iconName} />
+                      <NavSpan>
+                        {link.linkName}
+                      </NavSpan>
                     </NavLink>
                   </SideNavItem>)
               })}

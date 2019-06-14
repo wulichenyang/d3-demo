@@ -8,15 +8,18 @@ export const base = {
   primaryText: '#333',
   secondaryText: '#717172',
   headerText: '#333',
+  editorCommandColor: '#333',
+  topicText: '#428BCA',
+  preText: '#333',
+  
   asideText: '#666',
   asideLinkActive: '#1890ff',
   asideLinkHover: '',
   asideLinkActiveBackground: '#e6f7ff;',
   link: '#428BCA',
   linkHover: '#5dade2',
-  editorCommandColor: '#333',
-  topicText: '#428BCA',
-  preText: '#333',
+  breadTabText: '#999',
+  
 
   // Backgrounds
   primaryBackground: '#D2D5DA',
@@ -27,6 +30,11 @@ export const base = {
   topicBackground: '#f8f8f8',
   preBackground: '#f5f5f5',
   alteringTableRowBackground: '#f5f5f5',
+
+  headerBackground: '#fff',
+  mainBackground: '#f0f2f5',
+  ButtonToggleHover: '#f9f9fc',
+  graphViewWrapperBackground: '#fff',
 
   // Fonts
   primaryFontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
