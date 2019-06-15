@@ -2,8 +2,12 @@ import {
   get,
 } from "./http"
 
-export const getGraphViewData = async (): Promise<any> => {
-  return get('/graph')
+export const getForceDirectedGraphData = async (): Promise<any> => {
+  return get('/graph/forceDirectedGraph')
+}
+
+export const getSunburstGraphData = async (): Promise<any> => {
+  return get('/graph/sunburstGraphData')
 }
 
 // export const getSongDetail = async (id: number): Promise<any> => {

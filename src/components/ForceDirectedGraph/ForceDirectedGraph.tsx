@@ -11,7 +11,7 @@ import {
 } from 'd3-selection';
 import { getTranslation } from '../../utils/d3-transform'
 import {
-  getGraphViewData
+  getForceDirectedGraphData
 } from '../../api/graph'
 
 import {
@@ -45,7 +45,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
   //   svg: {},
   // };
   async componentDidMount() {
-    const res: Ajax.AjaxResponse = await getGraphViewData()
+    const res: Ajax.AjaxResponse = await getForceDirectedGraphData()
     if (res && res.code === 0) {
       // console.log(res)
       this.setState({
@@ -309,7 +309,6 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
 
     return (
       <>
-        <h2>graph IGraphViewDataItem</h2>
         <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
       </>
     );

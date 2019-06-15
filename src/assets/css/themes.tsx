@@ -13,6 +13,7 @@ export const base = {
   preText: '#333',
   
   asideText: '#666',
+  CardText: '#666',
   asideLinkActive: '#1890ff',
   asideLinkHover: '',
   asideLinkActiveBackground: '#e6f7ff;',

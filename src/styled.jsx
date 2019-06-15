@@ -108,14 +108,21 @@ font-size: 13px;
 -webkit-font-smoothing: antialiased;
 overflow: hidden;
 `
-export const BreadTabWrapper = styled.section`
-  margin-bottom: 24px;
-  color: ${props => props.theme.breadTabText}
-`
+
 export const GraphViewWrapper = styled.section`
+  position: relative;
   padding: 24px 36px;
+  margin-bottom: 24px;
+  color: ${props => props.theme.CardText}
+  font-size: 13px;
+  font-variant: tabular-nums;
+  text-align: center;
+  line-height: 1.5;
+  list-style: none;
+  font-feature-settings: "tnum";
   background-color: ${props => props.theme.graphViewWrapperBackground}
-  transition: all .3s ease
+  transition: all .3s ease;
+  overflow-x: hidden;
   &:hover {
     box-shadow: 4px 4px 40px rgba(0,0,0,.05);
     transition: all .3s ease

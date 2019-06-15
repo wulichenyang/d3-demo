@@ -9,10 +9,11 @@ import Footer from '../../components/Layout/Footer/Footer'
 import {
   MainWrapper,
   RightWrapper,
+  BreadTabWrapper
 } from './styled.jsx'
 
 interface IProps {
-  toggleSidebar: ()=>void
+  toggleSidebar: () => void
 }
 
 class Main extends React.Component<IProps, {}> {
@@ -21,7 +22,10 @@ class Main extends React.Component<IProps, {}> {
     return (
       <RightWrapper id="right-wrapper">
         <Header toggleSidebar={toggleSidebar} />
-        <MainWrapper className="dd">
+        <MainWrapper>
+          <BreadTabWrapper>
+            bread
+          </BreadTabWrapper>
           <Route exact path="/" component={Home} />
           <Route path="/Force-directed" component={ForceGraph} />
           <Route path="/Sunburst" component={Sunburst} />

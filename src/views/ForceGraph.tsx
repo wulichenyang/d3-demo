@@ -3,16 +3,12 @@ import React, { Component } from 'react';
 // import { IGraphViewData } from '../components/GraphView/types'
 import ForceDirectedGraph from './../components/ForceDirectedGraph/ForceDirectedGraph';
 import {
-  BreadTabWrapper,
   GraphViewWrapper
 } from '../styled.jsx'
 
 const ForceGraph: React.FC<{}> = () => {
   return (
     <>
-      <BreadTabWrapper>
-        bread
-      </BreadTabWrapper>
       <GraphViewWrapper>
         <ForceDirectedGraph
           graphWidth={960}

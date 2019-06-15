@@ -9,13 +9,14 @@ import {
 import { Icon } from 'antd'
 interface IProps {
   toggleSidebar: () => void,
+  collapsed: boolean
 }
-export const Header: React.FC<IProps> = ({ toggleSidebar }: IProps) => {
+export const Header: React.FC<IProps> = ({ toggleSidebar, collapsed }: IProps) => {
   const onToggleSidebar = () => {
     toggleSidebar()
   }
   return (
-    <HeaderWrapper>
+    <HeaderWrapper className={collapsed? 'sidebar-collapsed' : ''}>
       <ButtonToggle onClick={onToggleSidebar}>
         <Icon type="menu-fold" />
       </ButtonToggle>
