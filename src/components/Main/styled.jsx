@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 export const RightWrapper = styled.div`
+  box-sizing: content-box;
   padding-top: 72px;
   height: calc(100vh - 72px);
   flex: 1;

@@ -13,15 +13,19 @@ import {
 } from './styled.jsx'
 
 interface IProps {
-  toggleSidebar: () => void
+  toggleSidebar: () => void,
+  collapsed: boolean,
 }
 
 class Main extends React.Component<IProps, {}> {
   render() {
-    const { toggleSidebar } = this.props
+    const { toggleSidebar, collapsed } = this.props
     return (
       <RightWrapper id="right-wrapper">
-        <Header toggleSidebar={toggleSidebar} />
+        <Header 
+          toggleSidebar={toggleSidebar} 
+          collapsed={collapsed}
+        />
         <MainWrapper>
           <BreadTabWrapper>
             bread
