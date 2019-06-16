@@ -3,7 +3,7 @@ const Mock = require('mockjs')
 const getForceDirectedGraphMock = () => {
   const data = Mock.mock({
       // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
-      'nodes|20': [{
+      'nodes|10000': [{
           // 属性 id 是一个自增数，起始值为 1，每次增 1
           'id|+1': 0,
           'name': () => Mock.mock('@name'),
@@ -12,13 +12,13 @@ const getForceDirectedGraphMock = () => {
             'Teacher',
             'Coder',
             'Doctor',
-            'Bitch'
+            'Police'
           ]
         }],
-        'relationships|20': [{
+        'relationships|10000': [{
           'id|+1': 0,
-          'source|0-19': 1,
-          'target|0-19': 1,
+          'source|0-9999': 1,
+          'target|0-9999': 1,
           'type|1': [
             'LOVE',
             'HATE',

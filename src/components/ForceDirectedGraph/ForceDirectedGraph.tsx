@@ -1,6 +1,6 @@
 import "./index.less";
-import { 
-  
+import {
+
 } from './styled';
 import React from 'react'
 import * as d3 from "d3";
@@ -55,7 +55,152 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
         }
       })
     }
-    this.initGraph(this.state.graphViewData.nodes,  this.state.graphViewData.relationships)
+    // If the number of nodes are less than 51, render all data.
+    if (this.state.graphViewData.nodes.length <= 50) {
+      this.initGraph(this.state.graphViewData.nodes, this.state.graphViewData.relationships)
+    } else { // More than 50 nodes, render only part of the nodes, click one node to show more relationships and nodes.
+      this.renderNodes(this.state.graphViewData.nodes.slice(0, 50))
+    }
+  }
+
+  renderNodes = (nodes: Node[]) => {
+    console.log(nodes)
+    // Listen to dragging of the SVG
+    const svgdragstarted = (d: D3dom) => {
+      d3Event.sourceEvent.stopPropagation();
+      d3Event.sourceEvent.preventDefault();
+      // console.log("start")
+
+      // Stop rendering
+      simulation.stop()
+    }
+    const svgdragged = (d: D3dom) => {
+      // console.log(draggableSvg.attr("transform"))
+      var t = getTranslation(draggableSvg.attr("transform"));
+      // console.log(t)
+      draggableSvg.attr("transform", "translate(" + [t[0] + d3Event.dx, t[1] + d3Event.dy] + ")")
+      // console.log("drag: " + getTranslation(draggableSvg.attr("transform")));
+    }
+    const svgdragended = (d: D3dom) => {
+      // console.log("end")
+    }
+
+    // Get relationships by source node
+    const getRelationships = (d: Node): Relationship[] => {
+      return this.state.graphViewData.relationships.filter(rel => {
+        return rel.source === d.id
+      })
+    }
+
+    // Get target nodes by relationships
+    const getNodes = (rels: Relationship[]): Node[] => {
+      const nodeIds = rels.map(rel => rel.target)
+      return this.state.graphViewData.nodes.filter(node => {
+        return nodeIds.indexOf(node.id) !== -1
+      })
+    }
+
+    const getSubGraph = (d: Node) => {
+      console.log(d)
+      const relationships = getRelationships(d)
+      const nodes = getNodes(relationships)
+      // TODO clean old svg
+      this.initGraph(nodes, relationships)
+    }
+
+    let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
+
+    let svg: D3dom = d3Select("svg.force-directed")
+      .attr("overflow", "hidden")
+      .call(d3Drag()
+        .on("start", svgdragstarted)
+        .on("drag", svgdragged)
+        .on("end", svgdragended)
+      )
+
+    let draggableSvg = svg.append("g")
+      .attr("class", "draggable-svg")
+      .attr("transform", "translate(0,0)")
+
+    let width: number = +svg.attr("width"),
+      height: number = +svg.attr("height"),
+      node: D3dom,
+      link: D3dom
+
+    let relType: D3dom,
+      relTextPath: D3dom
+
+    // Declare a force-directed graph simulation
+    let simulation = d3.forceSimulation()
+      .force("link", d3.forceLink().id(function (d: Relationship) { return d.id; }).distance(200).strength(1))
+      .force("charge", d3.forceManyBody().strength(-30)) // ???
+      .force("center", d3.forceCenter(width / 2, height / 2))
+    // .alphaDecay(.7)
+    const enter = (nodes: Node[]) => {
+      // Node
+      node = draggableSvg.append("g").attr("class", "nodes")
+        .selectAll(".node")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("class", "node")
+        .on("click", getSubGraph)
+        .call(d3Drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended) // TODO refresh position
+        );
+
+      node.append("title")
+        .text(function (d: Node) { return `(node)-${d.id}`; });
+
+      node.append("circle")
+        .attr("r", 10)
+        .style("fill", function (d: Node, i: number) { return colors(i % 6); })
+        .style("stroke", function (d: Node, i: number) { return d3.rgb(colors(i % 6)).darker(2); })
+
+      node.append("text")
+        .attr("dy", -3)
+        .text(function (d: Node) { return d.name + ":" + d.label; });
+
+      // Listen to the change of the location
+      simulation
+        .nodes(nodes)
+        .on("tick", ticked)
+      // .on("end", updatePosition)
+      simulation.force("link")
+        .links([]);
+
+      // Transition
+      svg.style("opacity", 1e-6)
+        .transition()
+        .duration(1000)
+        .style("opacity", 1);
+    }
+
+    const ticked = () => {
+      // Relocate nodes
+      node
+        .attr("transform", function (d: Node) { return "translate(" + d.x + ", " + d.y + ")"; });
+    }
+    // Dragging for the node
+    const dragstarted = (d: Node) => {
+      if (!d3Event.active) simulation.alphaTarget(0.3).restart()
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    const dragged = (d: Node) => {
+      d.fx = d3Event.x;
+      d.fy = d3Event.y;
+    }
+
+    const dragended = (d: Node) => {
+      if (!d3Event.active) simulation.alphaTarget(0);
+      d.fx = undefined;
+      d.fy = undefined;
+    }
+    enter(nodes)
   }
 
   initGraph = (nodes: Node[], relationships: Relationship[]) => {
@@ -77,8 +222,8 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     }
     const svgdragended = (d: D3dom) => {
       // console.log("end")
-
     }
+
     let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
 
     let svg: D3dom = d3Select("svg.force-directed")
@@ -106,7 +251,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
       .force("charge", d3.forceManyBody().strength(-100)) // ???
       .force("center", d3.forceCenter(width / 2, height / 2))
     // .alphaDecay(.7)
-    const update = (links: Relationship[], nodes: Node[]) => {
+    const enter = (links: Relationship[], nodes: Node[]) => {
       // Define Arrow
       draggableSvg.append('defs').append('marker')
         .attr('id', 'arrow-head')
@@ -292,7 +437,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     //   update(graph.links, graph.nodes);
     // })
 
-    update(relationships, nodes)
+    enter(relationships, nodes)
   }
 
   // componentDidUpdate(prevProps: IProps, { graphViewData }: IState) {
