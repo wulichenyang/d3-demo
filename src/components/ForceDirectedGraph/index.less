@@ -1,10 +1,47 @@
-.node {
-  stroke: #777;
-  stroke-width: .5px;
-}
-
-.link { 
-  stroke: #999;
-  stroke-opacity: .6; 
-  stroke-width: 1px; 
+.force-directed-wrapper {
+  position: relative;
+  &:hover {
+    .tool i {
+      opacity: 1;
+      transition: all .2s ease-in;
+    }
+  }
+  .node {
+    stroke: #777;
+    stroke-width: .5px;
+  }
+  
+  .link { 
+    stroke: #999;
+    stroke-opacity: .6; 
+    stroke-width: 1px; 
+  }
+  
+  .tool {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 48px;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    &:hover {
+      i {
+        transform: scale(1.2);
+        transition: .2s ease-in all;
+      }
+    }
+    i {
+      opacity: 0;
+      font-size: 32px;
+      transition: .2s  ease-in all;
+    }
+  }
+  .prevNodes {
+    left: 0px;
+  }
+  .nextNodes {
+    right: 0px;
+  }
 }

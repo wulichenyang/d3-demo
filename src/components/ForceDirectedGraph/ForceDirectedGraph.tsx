@@ -13,13 +13,13 @@ import { getTranslation } from '../../utils/d3-transform'
 import {
   getForceDirectedGraphData
 } from '../../api/graph'
-
 import {
   Node,
   Relationship,
   D3dom,
   IGraphViewData
 } from './types'
+import { Icon } from 'antd'
 
 interface IProps {
   graphWidth: number,
@@ -27,7 +27,12 @@ interface IProps {
 }
 
 interface IState {
-  graphViewData: IGraphViewData
+  graphViewData: IGraphViewData,
+  showMore: boolean,
+  nodePage: number,
+  nodeTotal: number,
+  maxNode: number,
+  pageTotal: number,
 }
 
 class ForceDirectedGraph extends React.Component<IProps, IState> {
@@ -35,7 +40,12 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     graphViewData: {
       nodes: [],
       relationships: []
-    }
+    },
+    showMore: false,
+    nodePage: 0,
+    maxNode: 50,
+    nodeTotal: 0,
+    pageTotal: 0,
   }
   static defaultProps = {
     graphWidth: 960,
@@ -55,11 +65,18 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
         }
       })
     }
-    // If the number of nodes are less than 51, render all data.
-    if (this.state.graphViewData.nodes.length <= 50) {
+    // If the number of nodes are less than maxNode + 1, render all data.
+    const nodeTotal = this.state.graphViewData.nodes.length
+    if (nodeTotal <= this.state.maxNode) {
       this.initGraph(this.state.graphViewData.nodes, this.state.graphViewData.relationships)
-    } else { // More than 50 nodes, render only part of the nodes, click one node to show more relationships and nodes.
-      this.renderNodes(this.state.graphViewData.nodes.slice(0, 50))
+    } else { // More than this.state.maxNode nodes, render only part of the nodes, click one node to show more relationships and nodes.
+      this.setState({
+        showMore: true,
+        nodePage: 0,
+        nodeTotal,
+        pageTotal: Math.ceil(nodeTotal / this.state.maxNode)
+      })
+      this.renderNodes(this.state.graphViewData.nodes.slice(0, this.state.maxNode))
     }
   }
 
@@ -93,19 +110,34 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     }
 
     // Get target nodes by relationships
-    const getNodes = (rels: Relationship[]): Node[] => {
+    const getTargetNodes = (rels: Relationship[]): Node[] => {
       const nodeIds = rels.map(rel => rel.target)
       return this.state.graphViewData.nodes.filter(node => {
         return nodeIds.indexOf(node.id) !== -1
       })
     }
 
+    const clearOldGraph = () => {
+      svg.selectAll('*').remove()
+    }
+
     const getSubGraph = (d: Node) => {
       console.log(d)
       const relationships = getRelationships(d)
-      const nodes = getNodes(relationships)
-      // TODO clean old svg
-      this.initGraph(nodes, relationships)
+      const allNodes = [
+        {
+          id: d.id,
+          label: d.label,
+          name: d.name
+        }
+        ,
+        ...getTargetNodes(relationships)
+      ]
+
+      //Clean old svg
+      clearOldGraph()
+      console.log(allNodes, relationships)
+      this.initGraph(allNodes, relationships)
     }
 
     let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
@@ -440,6 +472,34 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     enter(relationships, nodes)
   }
 
+  getPrevNodes = () => {
+    const { nodePage, maxNode } = this.state
+    if (nodePage !== 0) {
+      this.setState({
+        nodePage: nodePage - 1
+      })
+    }
+    const start = this.state.nodePage * maxNode
+    const end = start + 50
+    this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
+  }
+  
+  getNextNodes = () => {
+    const { nodePage, maxNode, pageTotal } = this.state
+    if(nodePage + 1 === pageTotal) {
+      this.setState({
+        nodePage: 0
+      })
+    } else {
+      this.setState({
+        nodePage: nodePage + 1
+      })
+    }
+    const start = this.state.nodePage * maxNode
+    const end = start + 50
+    this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
+  }
+
   // componentDidUpdate(prevProps: IProps, { graphViewData }: IState) {
   //   const { nodes, relationships } = graphViewData
   //   this.updateGraph(nodes, relationships)
@@ -451,11 +511,31 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
 
   render() {
     const { graphWidth, graphHeight } = this.props
-
+    const { showMore, nodePage } = this.state
+    const { getPrevNodes, getNextNodes } = this
     return (
-      <>
+      <div className="force-directed-wrapper">
         <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
-      </>
+        {showMore ?
+          (<>
+            {nodePage !== 0 ?
+              <div
+                className="tool prevNodes"
+                onClick={getPrevNodes}
+              >
+                <Icon type="left" />
+              </div> : null
+            }
+            <div
+              className="tool nextNodes"
+              onClick={getNextNodes}
+            >
+              <Icon type="right" />
+            </div>
+          </>
+          ) : null
+        }
+      </div>
     );
   }
 }
