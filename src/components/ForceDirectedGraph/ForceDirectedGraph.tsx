@@ -80,6 +80,10 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     }
   }
 
+  clearOldGraph = () => {
+    d3Select('svg.force-directed').selectAll('*').remove()
+  }
+
   renderNodes = (nodes: Node[]) => {
     console.log(nodes)
     // Listen to dragging of the SVG
@@ -117,10 +121,6 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
       })
     }
 
-    const clearOldGraph = () => {
-      svg.selectAll('*').remove()
-    }
-
     const getSubGraph = (d: Node) => {
       console.log(d)
       const relationships = getRelationships(d)
@@ -135,7 +135,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
       ]
 
       //Clean old svg
-      clearOldGraph()
+      this.clearOldGraph()
       console.log(allNodes, relationships)
       this.initGraph(allNodes, relationships)
     }
@@ -472,32 +472,33 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     enter(relationships, nodes)
   }
 
-  getPrevNodes = () => {
+  getPrevPageNodes = () => {
     const { nodePage, maxNode } = this.state
     if (nodePage !== 0) {
       this.setState({
         nodePage: nodePage - 1
+      }, () => {
+        const start = this.state.nodePage * maxNode
+        const end = start + 50
+        this.clearOldGraph()
+        this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
       })
     }
-    const start = this.state.nodePage * maxNode
-    const end = start + 50
-    this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
   }
-  
-  getNextNodes = () => {
+
+  getNextPageNodes = () => {
     const { nodePage, maxNode, pageTotal } = this.state
-    if(nodePage + 1 === pageTotal) {
-      this.setState({
-        nodePage: 0
-      })
-    } else {
+    if (nodePage + 1 !== pageTotal) {
       this.setState({
         nodePage: nodePage + 1
+      }, () => {
+        console.log(this.state.nodePage)
+        const start = this.state.nodePage * maxNode
+        const end = start + 50
+        this.clearOldGraph()
+        this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
       })
     }
-    const start = this.state.nodePage * maxNode
-    const end = start + 50
-    this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
   }
 
   // componentDidUpdate(prevProps: IProps, { graphViewData }: IState) {
@@ -511,8 +512,8 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
 
   render() {
     const { graphWidth, graphHeight } = this.props
-    const { showMore, nodePage } = this.state
-    const { getPrevNodes, getNextNodes } = this
+    const { showMore, nodePage, pageTotal } = this.state
+    const { getPrevPageNodes, getNextPageNodes } = this
     return (
       <div className="force-directed-wrapper">
         <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
@@ -521,17 +522,19 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
             {nodePage !== 0 ?
               <div
                 className="tool prevNodes"
-                onClick={getPrevNodes}
+                onClick={getPrevPageNodes}
               >
                 <Icon type="left" />
               </div> : null
             }
-            <div
-              className="tool nextNodes"
-              onClick={getNextNodes}
-            >
-              <Icon type="right" />
-            </div>
+            {(nodePage + 1) !== pageTotal ?
+              <div
+                className="tool nextNodes"
+                onClick={getNextPageNodes}
+              >
+                <Icon type="right" />
+              </div> : null
+            }
           </>
           ) : null
         }
