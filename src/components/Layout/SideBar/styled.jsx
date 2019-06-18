@@ -69,7 +69,6 @@ transition: all .2s;
   `
 
 export const SideContentWrapper = styled.div`
-box-sizing: content-box;
 height: calc(100vh - 72px);
 `
 
