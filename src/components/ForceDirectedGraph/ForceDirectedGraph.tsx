@@ -33,6 +33,8 @@ interface IState {
   nodeTotal: number,
   maxNode: number,
   pageTotal: number,
+  expandedNodes: Node[],
+  expandedRelationships: Relationship[]
 }
 
 class ForceDirectedGraph extends React.Component<IProps, IState> {
@@ -46,6 +48,8 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     maxNode: 50,
     nodeTotal: 0,
     pageTotal: 0,
+    expandedNodes:[],
+    expandedRelationships: []
   }
   static defaultProps = {
     graphWidth: 960,
@@ -80,10 +84,17 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     }
   }
 
-  // Get relationships by source node
-  getRelationships = (d: Node): Relationship[] => {
+  // Get out relationships by source node
+  getOutRelationships = (d: Node): Relationship[] => {
     return this.state.graphViewData.relationships.filter(rel => {
       return rel.source === d.id
+    })
+  }
+
+  // Get in relationships by source node
+  getInRelationships = (d: Node): Relationship[] => {
+    return this.state.graphViewData.relationships.filter(rel => {
+      return rel.target === d.id
     })
   }
 
@@ -95,27 +106,48 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     })
   }
 
+  // Get source nodes by relationships
+  getSourceNodes = (rels: Relationship[]): Node[] => {
+    const nodeIds = rels.map(rel => rel.source)
+    return this.state.graphViewData.nodes.filter(node => {
+      return nodeIds.indexOf(node.id) !== -1
+    })
+  }
+
   clearOldGraph = () => {
     d3Select('svg.force-directed').selectAll('*').remove()
   }
 
-  getSubGraph = (d: Node) => {
+  // First Click
+  initSubGraph = (d: Node) => {
     console.log(d)
-    const relationships = this.getRelationships(d)
+    const outRelationships = this.getOutRelationships(d)
+    const inRelationships = this.getOutRelationships(d)
     const allNodes = [
       {
         id: d.id,
         label: d.label,
-        name: d.name
+        name: d.name,
+        expanded: true,
       }
       ,
-      ...this.getTargetNodes(relationships)
+      ...this.getTargetNodes(outRelationships),
+      ...this.getSourceNodes(inRelationships),
+    ]
+    const allRelationships = [
+      ...outRelationships,
+      ...inRelationships,
     ]
 
     //Clean old svg
     this.clearOldGraph()
-    console.log(allNodes, relationships)
-    this.initGraph(allNodes, relationships)
+    console.log(allNodes, outRelationships)
+    console.log(allNodes, inRelationships)
+    this.setState({
+      expandedNodes: allNodes,
+      expandedRelationships: allRelationships
+    })
+    this.initGraph(allNodes, allRelationships, true)
   }
 
   // Listen to dragging of the SVG
@@ -205,7 +237,39 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     // }
   }
 
+  // When Num > maxNode, Click one node to expand
+  // BUG TODO: Duplicated nodes and relationships
+  expandSubGraph = (d: Node) => {
+    // Enter
+    console.log(d)
+    // Not clicked
+    if(!d.expanded) {
+      const relationships = this.getOutRelationships(d)
+      this.setState({
+        expandedNodes: [
+          ...this.state.expandedNodes,
+          {
+            ...(this.state.expandedNodes)[this.state.expandedNodes.indexOf(d)],
+            expanded: true
+          },
+          ...this.getTargetNodes(relationships),
+        ],
+        expandedRelationships: [
+          ...this.state.expandedRelationships,
+          ...relationships,
+        ]
+      }, ()=> {
+        //Clean old svg
+        this.clearOldGraph()
+        console.log(this.state.expandedNodes, this.state.expandedRelationships)
+        // this.updateExpandSubGraph()
+        this.initGraph(this.state.expandedNodes, this.state.expandedRelationships, true)
+      })
+    }
+  }
+
   renderNodes = (nodes: Node[]) => {
+    // Enter
     console.log(nodes)
 
     let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
@@ -235,8 +299,8 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     let node: D3dom,
       link: D3dom
 
-    let relType: D3dom,
-      relTextPath: D3dom
+    // let relType: D3dom,
+    //   relTextPath: D3dom
 
     const enter = (nodes: Node[]) => {
       // Node
@@ -246,7 +310,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
         .enter()
         .append("g")
         .attr("class", "node")
-        .on("click", this.getSubGraph)
+        .on("click", this.initSubGraph)
         .call(d3Drag()
           .on("start", this.dragstarted(simulation))
           .on("drag", this.dragged)
@@ -283,8 +347,8 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     enter(nodes)
   }
 
-  initGraph = (nodes: Node[], relationships: Relationship[]) => {
-
+  initGraph = (nodes: Node[], relationships: Relationship[], allowExpand: boolean = false) => {
+    // Enter
     let colors: any = d3.scaleOrdinal(d3.schemeCategory10);
 
     let svg: D3dom = d3Select("svg.force-directed")
@@ -383,6 +447,10 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
           .on("drag", this.dragged)
           .on("end", this.dragended(simulation)) // TODO refresh position
         );
+
+      if (allowExpand) {
+        node.on('click', this.expandSubGraph)
+      }
 
       node.append("title")
         .text(function (d: Node) { return `(node)-${d.id}`; });

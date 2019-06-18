@@ -16,6 +16,7 @@ export interface Node {
   // after every tick, and vx, vy will be set to 0.
   fx?: number, // Fixed x-position
   fy?: number, // Fixed y-position
+  expanded?: boolean, // If being clicked to expand the node
 }
 
 export interface Relationship {
