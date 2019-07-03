@@ -211,11 +211,16 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     d3Select('svg.force-directed').selectAll('*').remove()
   }
 
+  // clearExpandedGraph = () => {
+    
+  // }
+
   // First Click
   initSubGraph = (d: Node) => {
+    // clearExpandedGraph ()
     console.log(d)
     const outRelationships = this.getOutRelationships(d)
-    const inRelationships = this.getOutRelationships(d)
+    const inRelationships = this.getInRelationships(d)
     const allNodes = [
       {
         id: d.id,
@@ -233,6 +238,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     ]
 
     //Clean old svg
+    // TODO: update it, not clear it.
     this.clearOldGraph()
     console.log(allNodes, outRelationships)
     console.log(allNodes, inRelationships)
