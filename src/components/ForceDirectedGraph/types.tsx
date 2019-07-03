@@ -22,11 +22,13 @@ export interface Node {
 export interface Relationship {
   /* Props of relationship */
   // TODO
-  id?: number,
+  id: number,
   source: number | Node,
   target: number | Node,
   type: string,
-  [key: string]: any
+  [key: string]: any,
+  // 新的关系？？
+  internal: boolean,
 
   /* Simulation system add these attributes to link */
   index?: number, // Index for link of the array

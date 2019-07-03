@@ -27,28 +27,37 @@ interface IProps {
 }
 
 interface IState {
-  graphViewData: IGraphViewData,
-  showMore: boolean,
+  // graphViewData: IGraphViewData,
+  nodes: Node[],
+  nodeMap: {
+    [key: number]: Node | null
+  },
+  relationships: Relationship[],
+  relationshipMap: {
+    [key: number]: Relationship | null
+  }
+  expandedNodes: Node[],
+  expandedRelationships: Relationship[]
+  showMoreModal: boolean,
   nodePage: number,
   nodeTotal: number,
   maxNode: number,
   pageTotal: number,
-  expandedNodes: Node[],
-  expandedRelationships: Relationship[]
 }
 
 class ForceDirectedGraph extends React.Component<IProps, IState> {
   readonly state: IState = {
-    graphViewData: {
-      nodes: [],
-      relationships: []
-    },
-    showMore: false,
+    nodes: [],
+    relationships: [],
+    nodeMap: {},
+    relationshipMap: {},
+
+    showMoreModal: false,
     nodePage: 0,
     maxNode: 50,
     nodeTotal: 0,
     pageTotal: 0,
-    expandedNodes:[],
+    expandedNodes: [],
     expandedRelationships: []
   }
   static defaultProps = {
@@ -63,37 +72,121 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
     if (res && res.code === 0) {
       // console.log(res)
       this.setState({
-        graphViewData: {
-          nodes: res.data.nodes,
-          relationships: res.data.relationships
-        }
+        nodes: res.data.nodes,
+        relationships: res.data.relationships
       })
     }
-    // If the number of nodes are less than maxNode + 1, render all data.
-    const nodeTotal = this.state.graphViewData.nodes.length
+    // If the number of nodes is less than maxNode + 1, render all data.
+    const nodeTotal = this.state.nodes.length
     if (nodeTotal <= this.state.maxNode) {
-      this.initGraph(this.state.graphViewData.nodes, this.state.graphViewData.relationships)
-    } else { // More than this.state.maxNode nodes, render only part of the nodes, click one node to show more relationships and nodes.
+      this.initGraph(this.state.nodes, this.state.relationships)
+    } else {
+      // The number of nodes is more than MaxNode, 
+      // render only part of the nodes, 
+      // click one node to show more relationships and nodes from this memory.
       this.setState({
-        showMore: true,
+        showMoreModal: true,
         nodePage: 0,
         nodeTotal,
         pageTotal: Math.ceil(nodeTotal / this.state.maxNode)
       })
-      this.renderNodes(this.state.graphViewData.nodes.slice(0, this.state.maxNode))
+      this.renderNodes(this.state.nodes.slice(0, this.state.maxNode))
     }
+  }
+
+  // Add nodes to nodes and nodesMap
+  addNodes(nodes: Node[]) {
+    for (let node of Array.from(nodes)) {
+      // In case of duplicated nodes.
+      if (this.findNode(node.id) == null) {
+        this.setState({
+          nodeMap: {
+            ...this.state.nodeMap,
+            [node.id]: node
+          },
+          nodes: [
+            ...this.state.nodes,
+            node
+          ],
+        })
+        // this.state.nodeMap[node.id] = node
+        // this.state.nodes.push(node)
+      }
+    }
+    return this
+  }
+
+  // Get all returned nodes
+  getNodes() {
+    return this.state.nodes
+  }
+
+  // Find one node by id
+  findNode(id: number) {
+    return this.state.nodeMap[id]
+  }
+
+  // Remove one node from nodeMap and nodes
+  removeNode(node: Node) {
+    if (this.findNode(node.id) != null) {
+      // delete this.nodeMap[node.id]
+      this.setState({
+        nodeMap: {
+          ...this.state.nodeMap,
+          [node.id]: null,
+        },
+        nodes: this.state.nodes.filter(item => item.id !== node.id)
+      })
+      // this.state.nodes.splice(this.state.nodes.indexOf(node), 1)
+    }
+    // return this
+  }
+
+  // Add relationships to relationships and relationshipMap
+  addRelationships(relationships: Relationship[]) {
+    for (let relationship of Array.from(relationships)) {
+      const existingRelationship = this.findRelationship(relationship.id)
+      if (existingRelationship != null) {
+        existingRelationship.internal = false
+      } else {
+        relationship.internal = false
+        this.setState({
+          relationshipMap: {
+            ...this.state.relationshipMap,
+            [relationship.id]: relationship
+          },
+          relationships: [
+            ...this.state.relationships,
+            relationship
+          ]
+        })
+        // this.relationshipMap[relationship.id] = relationship
+        // this._relationships.push(relationship)
+      }
+    }
+    // return this
+  }
+
+  // Get all returned relationships
+  getRelationships() {
+    return this.state.relationships
+  }
+
+  // Find one relationship by id
+  findRelationship(id: number) {
+    return this.state.relationshipMap[id]
   }
 
   // Get out relationships by source node
   getOutRelationships = (d: Node): Relationship[] => {
-    return this.state.graphViewData.relationships.filter(rel => {
+    return this.state.relationships.filter(rel => {
       return rel.source === d.id
     })
   }
 
   // Get in relationships by source node
   getInRelationships = (d: Node): Relationship[] => {
-    return this.state.graphViewData.relationships.filter(rel => {
+    return this.state.relationships.filter(rel => {
       return rel.target === d.id
     })
   }
@@ -101,7 +194,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
   // Get target nodes by relationships
   getTargetNodes = (rels: Relationship[]): Node[] => {
     const nodeIds = rels.map(rel => rel.target)
-    return this.state.graphViewData.nodes.filter(node => {
+    return this.state.nodes.filter(node => {
       return nodeIds.indexOf(node.id) !== -1
     })
   }
@@ -109,7 +202,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
   // Get source nodes by relationships
   getSourceNodes = (rels: Relationship[]): Node[] => {
     const nodeIds = rels.map(rel => rel.source)
-    return this.state.graphViewData.nodes.filter(node => {
+    return this.state.nodes.filter(node => {
       return nodeIds.indexOf(node.id) !== -1
     })
   }
@@ -238,12 +331,12 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
   }
 
   // When Num > maxNode, Click one node to expand
-  // BUG TODO: Duplicated nodes and relationships
+  // BUG TODO: Duplicate nodes and relationships
   expandSubGraph = (d: Node) => {
     // Enter
     console.log(d)
     // Not clicked
-    if(!d.expanded) {
+    if (!d.expanded) {
       const relationships = this.getOutRelationships(d)
       this.setState({
         expandedNodes: [
@@ -258,7 +351,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
           ...this.state.expandedRelationships,
           ...relationships,
         ]
-      }, ()=> {
+      }, () => {
         //Clean old svg
         this.clearOldGraph()
         console.log(this.state.expandedNodes, this.state.expandedRelationships)
@@ -495,7 +588,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
         const start = this.state.nodePage * maxNode
         const end = start + 50
         this.clearOldGraph()
-        this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
+        this.renderNodes(this.state.nodes.slice(start, end))
       })
     }
   }
@@ -510,7 +603,7 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
         const start = this.state.nodePage * maxNode
         const end = start + 50
         this.clearOldGraph()
-        this.renderNodes(this.state.graphViewData.nodes.slice(start, end))
+        this.renderNodes(this.state.nodes.slice(start, end))
       })
     }
   }
@@ -526,12 +619,12 @@ class ForceDirectedGraph extends React.Component<IProps, IState> {
 
   render() {
     const { graphWidth, graphHeight } = this.props
-    const { showMore, nodePage, pageTotal } = this.state
+    const { showMoreModal, nodePage, pageTotal } = this.state
     const { getPrevPageNodes, getNextPageNodes } = this
     return (
       <div className="force-directed-wrapper">
         <svg className="force-directed" width={graphWidth} height={graphHeight}></svg>
-        {showMore ?
+        {showMoreModal ?
           (<>
             {nodePage !== 0 ?
               <div
